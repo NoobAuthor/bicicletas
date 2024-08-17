@@ -1,35 +1,45 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Mapa con Leaflet</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
     <style>
-        #map { height: 400px; }
+      #map {
+        height: 400px;
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <div id="map"></div>
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <script>
-        const map = L.map('map').setView([-33.4489, -70.6693], 13); // Santiago, Chile
+      // Inicializar el mapa centrado en Santiago, Chile
+      const map = L.map("map").setView([-33.4489, -70.6693], 13);
 
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        }).addTo(map);
+      // Añadir la capa de tiles de OpenStreetMap
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        attribution:
+          '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+      }).addTo(map);
 
-        // Marcadores de bicicletas
-        const bicicletas = [
-            { lat: -33.447487, lng: -70.673676 },
-            { lat: -33.451284, lng: -70.665581 }
-        ];
+      // Función para agregar un marcador en el mapa
+      function addMarker(lat, lng, popupText) {
+        L.marker([lat, lng]).addTo(map).bindPopup(popupText).openPopup();
+      }
 
-        bicicletas.forEach(bici => {
-            L.marker([bici.lat, bici.lng]).addTo(map)
-                .bindPopup('Ubicación de la bicicleta.')
-                .openPopup();
-        });
+      // Realizar una solicitud GET a la API de bicicletas
+      fetch("/bicicletas")
+        .then((response) => response.json())
+        .then((data) => {
+          data.forEach((bici) => {
+            addMarker(bici.lat, bici.lng, `Modelo: ${bici.modelo}`);
+          });
+        })
+        .catch((error) =>
+          console.error("Error al obtener los datos de bicicletas:", error)
+        );
     </script>
-</body>
+  </body>
 </html>
